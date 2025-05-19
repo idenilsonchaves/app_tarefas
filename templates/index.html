@@ -1,0 +1,194 @@
+
+            {% extends "base.html" %}
+
+            {% block content %}
+                <h1 class="mb-4">Dashboard</h1>
+                
+                <!-- Estatísticas -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="stat-card completed">
+                            <h3>{{ stats.completed }}</h3>
+                            <p>Tarefas Concluídas</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card in-progress">
+                            <h3>{{ stats.in_progress }}</h3>
+                            <p>Em Andamento</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card pending">
+                            <h3>{{ stats.pending }}</h3>
+                            <p>Pendentes</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card today">
+                            <h3>{{ stats.today }}</h3>
+                            <p>Para Hoje</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Formulários -->
+                <div class="row mb-4">
+                    <!-- Adicionar Departamento -->
+                    <div class="col-md-4">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">Adicionar Departamento</h5>
+                            </div>
+                            <div class="card-body">
+                                <form action="{{ url_for('add_department') }}" method="POST">
+                                    <div class="mb-3">
+                                        <label for="name" class="form-label">Nome do Departamento</label>
+                                        <input type="text" class="form-control" id="name" name="name" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Adicionar</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Adicionar Funcionário -->
+                    <div class="col-md-4">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">Adicionar Funcionário</h5>
+                            </div>
+                            <div class="card-body">
+                                <form action="{{ url_for('add_employee') }}" method="POST">
+                                    <div class="mb-3">
+                                        <label for="employee_name" class="form-label">Nome</label>
+                                        <input type="text" class="form-control" id="employee_name" name="name" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="phone" class="form-label">Telefone</label>
+                                        <input type="text" class="form-control" id="phone" name="phone" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="department_id" class="form-label">Departamento</label>
+                                        <select class="form-select" id="department_id" name="department_id" required>
+                                            <option value="">Selecione um departamento</option>
+                                            {% for dept in departments %}
+                                                <option value="{{ dept.id }}">{{ dept.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Adicionar</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Adicionar Tarefa -->
+                    <div class="col-md-4">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">Adicionar Tarefa</h5>
+                            </div>
+                            <div class="card-body">
+                                <form action="{{ url_for('add_task') }}" method="POST">
+                                    <div class="mb-3">
+                                        <label for="service_type" class="form-label">Tipo de Serviço</label>
+                                        <input type="text" class="form-control" id="service_type" name="service_type" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="location" class="form-label">Localização</label>
+                                        <input type="text" class="form-control" id="location" name="location" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="status" class="form-label">Status</label>
+                                        <select class="form-select" id="status" name="status">
+                                            <option value="pending">Pendente</option>
+                                            <option value="in-progress">Em Andamento</option>
+                                            <option value="completed">Concluído</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="department_id_task" class="form-label">Departamento</label>
+                                        <select class="form-select" id="department_id_task" name="department_id" required>
+                                            <option value="">Selecione um departamento</option>
+                                            {% for dept in departments %}
+                                                <option value="{{ dept.id }}">{{ dept.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="employee_id" class="form-label">Funcionário (opcional)</label>
+                                        <select class="form-select" id="employee_id" name="employee_id">
+                                            <option value="">Selecione um funcionário (opcional)</option>
+                                            {% for emp in employees %}
+                                                <option value="{{ emp.id }}">{{ emp.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="execution_date" class="form-label">Data de Execução</label>
+                                        <input type="date" class="form-control" id="execution_date" name="execution_date" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Adicionar</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabela de Tarefas Recentes -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Tarefas Recentes</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Tipo de Serviço</th>
+                                        <th>Localização</th>
+                                        <th>Status</th>
+                                        <th>Departamento</th>
+                                        <th>Funcionário</th>
+                                        <th>Data de Execução</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for task in recent_tasks %}
+                                        <tr>
+                                            <td>{{ task.service_type }}</td>
+                                            <td>{{ task.location }}</td>
+                                            <td>
+                                                {% if task.status == 'completed' %}
+                                                    <span class="badge bg-success">Concluído</span>
+                                                {% elif task.status == 'in-progress' %}
+                                                    <span class="badge bg-primary">Em Andamento</span>
+                                                {% else %}
+                                                    <span class="badge bg-warning text-dark">Pendente</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ task.department_name or 'N/A' }}</td>
+                                            <td>{{ task.employee_name or 'N/A' }}</td>
+                                            <td>{{ task.execution_date.strftime('%d/%m/%Y') if task.execution_date else 'N/A' }}</td>
+                                        </tr>
+                                    {% else %}
+                                        <tr>
+                                            <td colspan="6" class="text-center">Nenhuma tarefa encontrada</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            {% endblock %}
+            
+            <script>
+                // Definir a data de hoje como padrão para o campo de data
+                document.addEventListener('DOMContentLoaded', function() {
+                    const today = new Date().toISOString().split('T')[0];
+                    document.getElementById('execution_date').value = today;
+                });
+            </script>
+            

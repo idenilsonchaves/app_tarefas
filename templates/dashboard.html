@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - TaskMaster{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title mb-4">
+                    <i class="fas fa-plus-circle me-2"></i>Nova Tarefa
+                </h4>
+                <form method="POST" action="{{ url_for('nova_tarefa') }}">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="titulo" class="form-label">Título</label>
+                            <input type="text" class="form-control" id="titulo" name="titulo" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="data_vencimento" class="form-label">Data de Vencimento</label>
+                            <input type="date" class="form-control" id="data_vencimento" name="data_vencimento" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="descricao" class="form-label">Descrição</label>
+                        <textarea class="form-control" id="descricao" name="descricao" rows="3" required></textarea>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="prioridade" class="form-label">Prioridade</label>
+                            <select class="form-select" id="prioridade" name="prioridade" required>
+                                <option value="1">Baixa</option>
+                                <option value="2">Média</option>
+                                <option value="3">Alta</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="funcionario_id" class="form-label">Funcionário</label>
+                            <select class="form-select" id="funcionario_id" name="funcionario_id" required>
+                                <option value="">Selecione um funcionário</option>
+                                {% for funcionario in funcionarios %}
+                                    <option value="{{ funcionario.id }}">{{ funcionario.nome }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="departamento_id" class="form-label">Departamento</label>
+                            <select class="form-select" id="departamento_id" name="departamento_id">
+                                <option value="">Selecione um departamento</option>
+                                {% for departamento in departamentos %}
+                                    <option value="{{ departamento.id }}">{{ departamento.nome }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>Salvar Tarefa
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title mb-4">
+                    <i class="fas fa-list me-2"></i>Minhas Tarefas
+                </h4>
+                
+                {% if tarefas %}
+                    {% for tarefa in tarefas %}
+                        <div class="card task-card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">
+                                    {{ tarefa.titulo }}
+                                    {% if tarefa.prioridade == 3 %}
+                                        <span class="badge bg-danger ms-2">Alta</span>
+                                    {% elif tarefa.prioridade == 2 %}
+                                        <span class="badge bg-warning ms-2">Média</span>
+                                    {% else %}
+                                        <span class="badge bg-success ms-2">Baixa</span>
+                                    {% endif %}
+                                </h5>
+                                <div>
+                                    {% if not tarefa.concluida %}
+                                        <form method="POST" action="{{ url_for('concluir_tarefa', tarefa_id=tarefa.id) }}" class="d-inline">
+                                            <button type="submit" class="btn btn-success btn-sm">
+                                                <i class="fas fa-check me-1"></i>Concluir
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                    <form method="POST" action="{{ url_for('excluir_tarefa', tarefa_id=tarefa.id) }}" class="d-inline">
+                                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Tem certeza que deseja excluir esta tarefa?')">
+                                            <i class="fas fa-trash me-1"></i>Excluir
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <p class="card-text">{{ tarefa.descricao }}</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">
+                                        <i class="fas fa-calendar me-1"></i>
+                                        Vencimento: {{ tarefa.data_vencimento.strftime('%d/%m/%Y') }}
+                                    </small>
+                                    <small class="text-muted">
+                                        <i class="fas fa-user me-1"></i>
+                                        Responsável: {{ tarefa.funcionario.nome }}
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>Você não tem tarefas cadastradas.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Atualiza a lista de funcionários quando um departamento é selecionado
+    document.getElementById('departamento_id').addEventListener('change', function() {
+        const departamentoId = this.value;
+        const funcionarioSelect = document.getElementById('funcionario_id');
+        
+        // Limpa as opções atuais
+        funcionarioSelect.innerHTML = '<option value="">Selecione um funcionário</option>';
+        
+        if (departamentoId) {
+            // Filtra os funcionários pelo departamento selecionado
+            const funcionariosList = JSON.parse('{{ funcionarios|tojson|safe }}');
+            const funcionariosFiltrados = funcionariosList.filter(f => f.departamento_id == departamentoId);
+            
+            // Adiciona as novas opções
+            funcionariosFiltrados.forEach(funcionario => {
+                const option = document.createElement('option');
+                option.value = funcionario.id;
+                option.textContent = funcionario.nome;
+                funcionarioSelect.appendChild(option);
+            });
+        }
+    });
+</script>
+{% endblock %} 
