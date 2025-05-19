@@ -1,0 +1,46 @@
+#:kivy 2.0.0
+
+<Button>:
+    background_normal: ''
+    background_color: 0.2, 0.6, 1, 1
+    color: 1, 1, 1, 1
+    font_size: '16sp'
+    size_hint_y: None
+    height: '48dp'
+    border_radius: [5]
+
+<TextInput>:
+    background_color: 1, 1, 1, 1
+    foreground_color: 0, 0, 0, 1
+    cursor_color: 0, 0, 0, 1
+    font_size: '16sp'
+    padding: [10, 10]
+    multiline: False
+    size_hint_y: None
+    height: '48dp'
+
+<Label>:
+    color: 0, 0, 0, 1
+    font_size: '16sp'
+    text_size: self.size
+    halign: 'left'
+    valign: 'middle'
+    padding: [10, 5]
+
+<ScrollView>:
+    canvas.before:
+        Color:
+            rgba: 0.95, 0.95, 0.95, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+<GridLayout>:
+    canvas.before:
+        Color:
+            rgba: 0.95, 0.95, 0.95, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    padding: [10, 10]
+    spacing: 10 
