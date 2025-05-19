@@ -25,10 +25,21 @@ jobs:
       - name: Install Buildozer
         run: |
           pip3 install --user buildozer
+          echo "Buildozer version:"
+          buildozer --version
+      
+      - name: List files
+        run: |
+          echo "Current directory contents:"
+          ls -la
+          echo "Python version:"
+          python3 --version
+          echo "Pip version:"
+          pip3 --version
       
       - name: Build APK
         run: |
-          buildozer android debug
+          buildozer android debug -v
       
       - name: Upload APK
         uses: actions/upload-artifact@v4
